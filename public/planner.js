@@ -35,6 +35,40 @@ function init() {
         }, 300);
     });
 
+    // Keyboard navigation for suggestions
+    destination?.addEventListener('keydown', (e) => {
+        const container = document.getElementById('suggestions');
+        if (container.classList.contains('hidden')) return;
+        const items = Array.from(container.querySelectorAll('.suggestion-item'));
+        if (!items.length) return;
+
+        const active = container.querySelector('.suggestion-active');
+        let idx = active ? items.indexOf(active) : -1;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (idx < items.length - 1) idx++;
+            else idx = 0;
+            items.forEach(i=>i.classList.remove('suggestion-active'));
+            items[idx].classList.add('suggestion-active');
+            items[idx].scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (idx > 0) idx--;
+            else idx = items.length - 1;
+            items.forEach(i=>i.classList.remove('suggestion-active'));
+            items[idx].classList.add('suggestion-active');
+            items[idx].scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'Enter') {
+            if (idx >= 0) {
+                e.preventDefault();
+                items[idx].click();
+            }
+        } else if (e.key === 'Escape') {
+            container.classList.add('hidden');
+        }
+    });
+
     // Click outside to close suggestions
     document.addEventListener('click', (e) => {
         if (!e.target.closest('#destination') && !e.target.closest('#suggestions')) {
@@ -86,25 +120,47 @@ async function showSuggestions(query) {
     try {
         const suggestions = await API.autocompleteLocation(query);
         
+
         if (suggestions.length === 0) {
             container.classList.add('hidden');
+            destination.setAttribute('aria-expanded', 'false');
             return;
         }
 
-        container.innerHTML = suggestions.map(s => `
-            <div class="suggestion-item text-gray-800 dark:text-white" data-place="${s.description}">
+        // Dedupe and limit suggestions
+        const seen = new Set();
+        const deduped = [];
+        for (const s of suggestions) {
+            const key = (s.place_id || s.description || s.main_text || '').toString();
+            if (!key) continue;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            deduped.push(s);
+            if (deduped.length >= 6) break; // limit to 6
+        }
+
+        container.innerHTML = deduped.map((s, index) => `
+            <div role="option" id="suggestion-${index}" tabindex="-1" class="suggestion-item text-gray-800 dark:text-white px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer" data-place="${s.description}">
                 <div class="font-semibold">${s.main_text || s.description}</div>
                 ${s.secondary_text ? `<div class="text-sm text-gray-500 dark:text-gray-400">${s.secondary_text}</div>` : ''}
             </div>
         `).join('');
 
-        container.classList.remove('hidden');
+    container.classList.remove('hidden');
+    destination.setAttribute('aria-expanded', 'true');
 
         // Add click handlers
         container.querySelectorAll('.suggestion-item').forEach(item => {
             item.addEventListener('click', () => {
                 document.getElementById('destination').value = item.dataset.place;
                 container.classList.add('hidden');
+                destination.focus();
+                destination.setAttribute('aria-expanded', 'false');
+            });
+            // hover to set active for keyboard
+            item.addEventListener('mouseenter', () => {
+                container.querySelectorAll('.suggestion-item').forEach(i => i.classList.remove('suggestion-active'));
+                item.classList.add('suggestion-active');
             });
         });
     } catch (error) {

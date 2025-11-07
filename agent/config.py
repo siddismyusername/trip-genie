@@ -1,8 +1,41 @@
 """
 Configuration management for TripGenie
 """
+import os
+from pathlib import Path
 from pydantic_settings import BaseSettings
 from typing import Optional
+
+
+# Load .env file located next to this module (agent/.env) first, then fallback to repo root .env
+def _load_local_env():
+    candidates = [
+        Path(__file__).parent / ".env",        # agent/.env
+        Path(__file__).parent.parent / ".env", # repo-root .env
+        Path.cwd() / ".env"
+    ]
+
+    for p in candidates:
+        try:
+            if p.exists():
+                with p.open("r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if not line or line.startswith("#") or "=" not in line:
+                            continue
+                        k, v = line.split("=", 1)
+                        k = k.strip()
+                        v = v.strip().strip('"').strip("'")
+                        # don't overwrite existing environment variables
+                        if k and k not in os.environ:
+                            os.environ[k] = v
+                return
+        except Exception:
+            # ignore and try next candidate
+            continue
+
+
+_load_local_env()
 
 
 class Settings(BaseSettings):

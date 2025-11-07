@@ -144,3 +144,12 @@
 #suggestions .suggestion-item:last-child {
     border-bottom: none;
 }
+
+/* Active suggestion (keyboard or hover) */
+#suggestions .suggestion-active {
+    background: #eef2ff;
+}
+
+.dark #suggestions .suggestion-active {
+    background: #374151;
+}
