@@ -1,0 +1,44 @@
+# Ignore Python virtual environment
+env/
+venv/
+ENV/
+.venv/
+
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Ignore environment variables
+.env
+.env.local
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore output files
+sample_itinerary.json
+demo_itinerary.json
+*.log
+
+# Ignore distribution files
+dist/
+build/
+*.egg-info/
+
+# Ignore test coverage
+htmlcov/
+.coverage
+.pytest_cache/

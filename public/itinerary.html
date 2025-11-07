@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Itinerary - TripGenie</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1xbvat5u8h_z-zLp9kmEFngZ1PC8N6RA&callback=initMap&libraries=places" async defer></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0da6f2",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101c22",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+    <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+        <div class="layout-container flex h-full grow flex-col">
+            <!-- Header -->
+            <div class="sticky top-0 z-10 w-full border-b border-solid border-white/10 dark:border-b-[#283339] bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+                <header class="mx-auto flex w-full max-w-7xl h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
+                    <a href="index.html" class="flex items-center gap-3 cursor-pointer">
+                        <div class="size-6 text-primary">
+                            <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z" fill="currentColor"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-xl font-bold leading-tight tracking-[-0.015em] text-slate-900 dark:text-white">TripGenie</h2>
+                    </a>
+                    <nav class="hidden items-center gap-8 md:flex">
+                        <a class="text-sm font-medium text-slate-600 dark:text-white/80 transition-colors hover:text-slate-900 dark:hover:text-white" href="index.html">Home</a>
+                        <a class="text-sm font-medium text-slate-600 dark:text-white/80 transition-colors hover:text-slate-900 dark:hover:text-white" href="planner.html">Plan Trip</a>
+                        <a class="text-sm font-medium text-slate-600 dark:text-white/80 transition-colors hover:text-slate-900 dark:hover:text-white" href="itinerary.html">My Itinerary</a>
+                    </nav>
+                    <button id="themeToggle" class="flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 dark:text-white/80 transition-colors hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white">
+                        <span class="text-2xl">☀️</span>
+                    </button>
+                </header>
+            </div>
+
+            <!-- No Itinerary State -->
+            <div id="noItinerary" class="flex-1 flex items-center justify-center p-8">
+                <div class="text-center max-w-md">
+                    <div class="text-6xl mb-4">🗺️</div>
+                    <h2 class="text-3xl font-bold mb-4 text-slate-900 dark:text-white">No Itinerary Yet</h2>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6">Create your first AI-powered itinerary</p>
+                    <a href="planner.html" class="inline-block bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition">
+                        Plan a Trip
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <main id="itineraryContent" class="hidden flex-1 px-4 sm:px-8 lg:px-16 py-8 overflow-y-auto">
+                <div class="mx-auto max-w-7xl">
+                    <!-- Title Section -->
+                    <div class="flex flex-wrap justify-between items-start gap-6 pb-6">
+                        <div class="flex min-w-72 flex-col gap-2">
+                            <p id="destTitle" class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]"></p>
+                            <p id="dateRange" class="text-slate-500 dark:text-[#9cb0ba] text-base font-normal leading-normal"></p>
+                        </div>
+                        <button id="regenerateBtn" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-[#283339] text-slate-900 dark:text-white text-sm font-bold leading-normal tracking-[0.015em] gap-2 hover:bg-slate-300 dark:hover:bg-[#3a4a53] transition-colors">
+                            <span class="material-symbols-outlined text-xl">autorenew</span>
+                            <span class="truncate">Re-generate</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                        <!-- Left Column: Trip Info & Days -->
+                        <div class="lg:col-span-2 flex flex-col gap-6">
+                            <!-- Trip Info Card -->
+                            <div class="bg-white dark:bg-[#1a2831] p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-[#3b4c54]">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6">
+                                    <div class="flex flex-col gap-1">
+                                        <p class="text-slate-500 dark:text-[#9cb0ba] text-sm font-medium leading-normal">Destination</p>
+                                        <p id="infoDestination" class="text-slate-900 dark:text-white text-base font-medium leading-normal"></p>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <p class="text-slate-500 dark:text-[#9cb0ba] text-sm font-medium leading-normal">Duration</p>
+                                        <p id="infoDuration" class="text-slate-900 dark:text-white text-base font-medium leading-normal"></p>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <p class="text-slate-500 dark:text-[#9cb0ba] text-sm font-medium leading-normal">Budget</p>
+                                        <p id="infoBudget" class="text-slate-900 dark:text-white text-base font-medium leading-normal"></p>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <p class="text-slate-500 dark:text-[#9cb0ba] text-sm font-medium leading-normal">Style</p>
+                                        <p id="infoStyle" class="text-slate-900 dark:text-white text-base font-medium leading-normal"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Days Container -->
+                            <div id="daysContainer" class="flex flex-col gap-4"></div>
+                        </div>
+
+                        <!-- Right Column: Map & Destinations -->
+                        <div class="lg:col-span-1 flex flex-col gap-6 lg:sticky lg:top-24">
+                            <!-- Map -->
+                            <div id="map" class="w-full aspect-[4/3] bg-slate-200 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-[#3b4c54]"></div>
+
+                            <!-- Destinations Card -->
+                            <div class="bg-white dark:bg-[#1a2831] p-4 rounded-xl border border-slate-200 dark:border-[#3b4c54]">
+                                <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Destinations</h3>
+                                <div id="destinationList" class="flex flex-col gap-3"></div>
+                                <button id="addDestination" class="mt-4 flex w-full items-center justify-center gap-2 rounded-lg h-10 px-4 bg-primary/20 text-primary text-sm font-bold leading-normal hover:bg-primary/30 transition-colors">
+                                    <span class="material-symbols-outlined text-xl">add_location_alt</span>
+                                    <span>Add Destination</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Bottom Left Action Buttons -->
+            <div id="actionButtons" class="hidden fixed bottom-6 left-6 flex flex-col gap-3 z-20">
+                <button id="exportJSON" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl">
+                    <span class="material-symbols-outlined text-xl mr-2">download</span>
+                    <span class="truncate">Export</span>
+                </button>
+                <button id="newTrip" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-slate-200 dark:bg-[#283339] text-slate-900 dark:text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-slate-300 dark:hover:bg-[#3a4a53] transition-all shadow-lg hover:shadow-xl">
+                    <span class="material-symbols-outlined text-xl mr-2">add_circle</span>
+                    <span class="truncate">New Trip</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="itinerary.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripGenie: AI-Powered Itinerary Planner</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+        body {
+            background-color: #101c22;
+            background: linear-gradient(-45deg, #101c22, #1a2c3a, #2a4a58, #101c22);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0da6f2",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101c22",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-display bg-background-dark">
+    <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+        <div class="flex h-full grow flex-col">
+            <div class="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 sm:px-6 lg:px-8">
+                <!-- Header -->
+                <header class="flex h-20 items-center justify-between border-b border-white/10">
+                    <a href="index.html" class="flex items-center gap-3 cursor-pointer">
+                        <div class="size-6 text-primary">
+                            <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z" fill="currentColor"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-xl font-bold leading-tight tracking-[-0.015em] text-white">TripGenie</h2>
+                    </a>
+                    <nav class="hidden items-center gap-8 md:flex">
+                        <a class="text-sm font-medium text-white/80 transition-colors hover:text-white" href="index.html">Home</a>
+                        <a class="text-sm font-medium text-white/80 transition-colors hover:text-white" href="planner.html">Plan Trip</a>
+                        <a class="text-sm font-medium text-white/80 transition-colors hover:text-white" href="itinerary.html">My Itinerary</a>
+                    </nav>
+                    <button id="themeToggle" class="flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/10 hover:text-white">
+                        <span class="text-2xl">☀️</span>
+                    </button>
+                </header>
+
+                <!-- Main Content -->
+                <main class="flex flex-1 flex-col items-center justify-center py-20 text-center">
+                    <div class="flex max-w-3xl flex-col items-center gap-6">
+                        <h1 class="text-4xl font-black leading-tight tracking-tighter text-white sm:text-5xl md:text-6xl">
+                            TripGenie: AI-Powered Itinerary Planner
+                        </h1>
+                        <h2 class="text-lg font-normal text-white/80 sm:text-xl">
+                            Plan your perfect trip in seconds using AI.
+                        </h2>
+                        <a href="planner.html" class="mt-4 flex h-12 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary px-6 text-base font-bold text-white shadow-lg transition-transform hover:scale-105 hover:shadow-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark sm:h-14 sm:px-8 sm:text-lg">
+                            <span class="truncate">Start Planning Now</span>
+                        </a>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

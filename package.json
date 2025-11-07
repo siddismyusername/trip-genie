@@ -1,0 +1,25 @@
+{
+  "name": "tripgen",
+  "version": "1.0.0",
+  "description": "AI agent based itineary planer ",
+  "license": "ISC",
+  "author": "Siddharth Chaudhary",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:python": "python agent/server.py",
+    "dev": "concurrently \"npm run start:python\" \"node server.js\"",
+    "lint": "echo 'No lint configured'",
+    "test": "echo 'No tests yet'"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
