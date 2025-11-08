@@ -7,7 +7,7 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "concurrently \"npm run start:python\" \"node server.js\"",
     "start:python": "python agent/server.py",
     "dev": "concurrently \"npm run start:python\" \"node server.js\"",
     "lint": "echo 'No lint configured'",
